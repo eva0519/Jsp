@@ -77,6 +77,9 @@ public class Calc2 extends HttpServlet {
 			opCookie.setPath("/calc2");
 			response.addCookie(valueCookie);
 			response.addCookie(opCookie);
+			
+			response.sendRedirect("calc2.html");
+			
 		}
 
 	}
