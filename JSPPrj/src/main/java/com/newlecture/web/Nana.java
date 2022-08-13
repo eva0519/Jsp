@@ -27,7 +27,7 @@ public class Nana extends HttpServlet{
 			cnt = Integer.parseInt(cnt_);
 		
 		for (int i = 0; i < cnt; i++) {
-			out.println((i+1) + ": 안녕 서블렛<br />");			
+			out.println((i+1) + ": 안녕 서블렛<br >");			
 		}
 		
 	}
