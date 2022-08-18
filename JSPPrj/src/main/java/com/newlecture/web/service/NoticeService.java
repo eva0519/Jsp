@@ -26,7 +26,7 @@ public class NoticeService {
 	
 	public List<Notice> getNoticeList(String field, String query,int page) {
 		
-		List<Notice> list = new ArrayList();
+//		List<Notice> list = new ArrayList();
 		
 		String sql = "select * from ("
 				+ "select rownum NUM, N.* from (select * from notice order by regdate desc) N"
@@ -60,7 +60,7 @@ public class NoticeService {
 						content
 						);
 				
-				list.add(notice);
+//				list.add(notice);
 				
 			}
 			
