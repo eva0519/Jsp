@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.newlecture.web.entity.Notice;
+import com.newlecture.web.entity.NoticeView;
 
 public class NoticeService {
 	
@@ -19,25 +20,88 @@ public class NoticeService {
 	private final String dPW = "";
 	private final int noticeLength = 10;
 	
-	public List<Notice> getNoticeList() {
+
+	public int removeNoticeAll(int[] ids){
+		
+		return 0;
+	}
+	
+	public int pubNoticeAll(int[] ids){
+		
+		return 0;
+	}
+
+	public int insertNotice(Notice notice){
+		
+		int result = 0;
+		
+		String sql = "insert into notice(title, content, writer_id, pub) values(?, ?, ?, ?)";
+		
+		try {
+			
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			Connection con = DriverManager.getConnection(url, dID, dPW);
+			PreparedStatement st = con.prepareStatement(sql);
+			st.setString(1, notice.getTitle());
+			st.setString(2, notice.getContent());
+			st.setString(3, notice.getWriterId());
+			st.setBoolean(4, notice.getPub());
+
+			result = st.executeUpdate();
+			// insult, update, delete 를 사용할 때는 executeUpdate() 서비스 메소드를 사용한다.
+			// 받아올 데이터가 없기 때문에 ResulSet 객체는 필요없음
+			// executeUpdate는 Db의 행삽입 행삭제 갯수 결과값을 int 값으로 return 한다
+			
+			st.close();
+			con.close();
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// db에 잘 등록되었다면 1을 반환한다
+		return result;
+		
+	}
+	
+	public int deleteNotice(int id){
+		
+		return 0;
+	}
+	
+	public int updateNotice(Notice notice){
+		
+		return 0;
+	}	
+
+	public List<Notice> getNoticeNewestList(){
+		
+		return null;
+	}
+	
+	public List<NoticeView> getNoticeList() {
 		
 		return getNoticeList("title", "", 1);
 		
 	}
 	
-	public List<Notice> getNoticeList(int page) {
+	public List<NoticeView> getNoticeList(int page) {
 		
 		return getNoticeList("title", "", page);
 		
 	}
 	
-	public List<Notice> getNoticeList(String field, String query,int page) {
+	public List<NoticeView> getNoticeList(String field, String query,int page) {
 		
-		List<Notice> list = new ArrayList<>();
+		List<NoticeView> list = new ArrayList<>();
 		
 		String sql = "select * from "
 				+ "(select rownum NUM, N.* from "
-				+ "(select * from notice where "+field+" like ? order by regdate desc) N "
+				+ "(select * from NOTICE_VIEW where "+field+" like ? order by regdate desc) N "
 				+ ") "
 				+ "where NUM between ? and ?";
 				
@@ -58,16 +122,20 @@ public class NoticeService {
 				Date regdate = rs.getDate("REGDATE");
 				String hit = rs.getString("HIT");
 				String files = rs.getString("FILES");
-				String content = rs.getString("CONTENT");
+				//String content = rs.getString("CONTENT");
+				boolean pub = rs.getBoolean("PUB");
+				int cmtCount = rs.getInt("CMT_COUNT");
 				
-				Notice notice = new Notice(
+				NoticeView notice = new NoticeView(
 						id,
 						title,
 						writerId,
 						regdate,
 						hit,
 						files,
-						content
+						pub,
+						//content,
+						cmtCount
 						);
 				
 				list.add(notice);
@@ -152,6 +220,7 @@ public class NoticeService {
 				String hit = rs.getString("HIT");
 				String files = rs.getString("FILES");
 				String content = rs.getString("CONTENT");
+				boolean pub = rs.getBoolean("PUB");
 				
 				notice = new Notice(
 						nid,
@@ -160,7 +229,8 @@ public class NoticeService {
 						regdate,
 						hit,
 						files,
-						content
+						content,
+						pub
 						);
 				
 			}
@@ -207,6 +277,7 @@ public class NoticeService {
 				String hit = rs.getString("HIT");
 				String files = rs.getString("FILES");
 				String content = rs.getString("CONTENT");
+				boolean pub = rs.getBoolean("PUB");
 				
 				notice = new Notice(
 						nid,
@@ -215,7 +286,8 @@ public class NoticeService {
 						regdate,
 						hit,
 						files,
-						content
+						content,
+						pub
 						);
 				
 			}
@@ -261,6 +333,8 @@ public class NoticeService {
 				String hit = rs.getString("HIT");
 				String files = rs.getString("FILES");
 				String content = rs.getString("CONTENT");
+				boolean pub = rs.getBoolean("PUB");
+				
 				
 				notice = new Notice(
 						nid,
@@ -269,7 +343,8 @@ public class NoticeService {
 						regdate,
 						hit,
 						files,
-						content
+						content,
+						pub
 						);
 				
 			}
@@ -287,6 +362,48 @@ public class NoticeService {
 		}
 		
 		return notice;
+	}
+
+	public int deleteNoticeAll(int[] ids) {
+		
+		int result = 0;
+		
+		String params = "";
+		
+		for (int i = 0; i < ids.length; i++) {
+			params += ids[i];
+			
+			if (i < ids.length-1) {
+				params += ",";
+				// 마지막 숫자만 빼고 ","를 붙여줌
+			}
+		}
+		
+		String sql = "delete notice where id in ("+params+")";
+		
+		try {
+			
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			Connection con = DriverManager.getConnection(url, dID, dPW);
+			Statement st = con.createStatement();
+
+			result = st.executeUpdate(sql);
+			// insult, update, delete 를 사용할 때는 executeUpdate() 서비스 메소드를 사용한다.
+			// 받아올 데이터가 없기 때문에 ResulSet 객체는 필요없음
+			// executeUpdate는 Db의 행삽입 행삭제 갯수 결과값을 int 값으로 return 한다
+			
+			st.close();
+			con.close();
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 	

@@ -1,35 +1,31 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-    
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>코딩 전문가를 만들기 위한 온라인 강의 시스템</title>
-    <meta charset="UTF-8">
-    <title>공지사항목록</title>
+<meta charset="UTF-8">
+<!-- <meta name="viewport" content="width=device-width,initial-scale=1"> -->
+<title>코딩 전문가를 만들기 위한 온라인 강의 시스템</title>
+<link href="/css/admin/layout.css" type="text/css" rel="stylesheet" />
+<style>
     
-    <link href="/css/customer/layout.css" type="text/css" rel="stylesheet" />
-    <style>
-    
-        #visual .content-container{	
-            height:inherit;
-            display:flex; 
-            align-items: center;
-            background: url("../../images/customer/visual.png") no-repeat center;
-        }
-    </style>
+    #visual .content-container{	
+        height:inherit;
+        display:flex; 
+        align-items: center;
+        
+        background: url("/images/mypage/visual.png") no-repeat center;
+    }
+</style>
 </head>
-
 <body>
-    <!-- header 부분 -->
+	<!-- header 부분 -->
+	
 
-	<header id="header">
+
+
+
+    <header id="header">
         
         <div class="content-container">
             <!-- ---------------------------<header>--------------------------------------- -->
@@ -48,7 +44,6 @@
                     <h1>메인메뉴</h1>
                     <ul>
                         <li><a href="/guide">학습가이드</a></li>
-
                         <li><a href="/course">강좌선택</a></li>
                         <li><a href="/answeris/index">AnswerIs</a></li>
                     </ul>
@@ -104,124 +99,55 @@
 
 			<!-- --------------------------- aside --------------------------------------- -->
 			<!-- aside 부분 -->
+			
 
 
 			<aside class="aside">
-				<h1>고객센터</h1>
+				<h1>ADMIN PAGE</h1>
 
 				<nav class="menu text-menu first margin-top">
-					<h1>고객센터메뉴</h1>
+					<h1>마이페이지</h1>
 					<ul>
-						<li><a class="current"  href="/customer/notice">공지사항</a></li>
-						<li><a class=""  href="/customer/faq">자주하는 질문</a></li>
-						<li><a class="" href="/customer/question">수강문의</a></li>
-						<li><a class="" href="/customer/event">이벤트</a></li>
-						
+						<li><a href="/admin/index.html">관리자홈</a></li>						
+						<li><a href="/teacher/index.html">선생님페이지</a></li>
+						<li><a href="/student/index.html">수강생페이지</a></li>
 					</ul>
 				</nav>
-
-
-	<nav class="menu">
-		<h1>협력업체</h1>
-		<ul>
-			<li><a target="_blank" href="http://www.notepubs.com"><img src="/images/notepubs.png" alt="노트펍스" /></a></li>
-			<li><a target="_blank" href="http://www.namoolab.com"><img src="/images/namoolab.png" alt="나무랩연구소" /></a></li>
-						
-		</ul>
-	</nav>
-					
+				
+				<nav class="menu text-menu">
+					<h1>알림관리</h1>
+					<ul>						
+						<li><a href="/admin/board/notice/list.html">공지사항</a></li>				
+					</ul>
+				</nav>
+								
 			</aside>
 			<!-- --------------------------- main --------------------------------------- -->
-
 			
-
-
-			<main>
-				<h2 class="main title">공지사항</h2>
-				
-				<div class="breadcrumb">
-					<h3 class="hidden">breadlet</h3>
-					<ul>
-						<li>home</li>
-						<li>고객센터</li>
-						<li>공지사항</li>
-					</ul>
-				</div>
-				
-				<div class="margin-top first">
-						<h3 class="hidden">공지사항 내용</h3>
-						<table class="table">
-							<tbody>
-								<tr>
-									<th>제목</th>
-									<td class="text-align-left text-indent text-strong text-orange" colspan="3">${n.title}</td>
-								</tr>
-								<tr>
-									<th>작성일</th>
-									<td class="text-align-left text-indent" colspan="3"><fmt:formatDate pattern="yyyy-MM-dd hh:mm:ss" value="${n.regdate}" /></td>
-								</tr>
-								<tr>
-									<th>작성자</th>
-									<td>${n.writerId}</td>
-									<th>조회수</th>
-									<td><fmt:formatNumber value="${n.hit}" /></td>
-								</tr>
-								<tr>
-									<th>첨부파일</th>
-									<td colspan="3" style="text-align:left; text-indent:10px;">
-									<c:forTokens var="fileName" items="${n.files}" delims="," varStatus="st">
-										<c:set var="style" value="" />
-										<c:if test="${fn:endsWith(fileName, '.zip')}">
-											<c:set var="style" value="font-weight:bold; color:red;"/>
-										</c:if>
-										<a href="${fileName}" style="${style}">${fn:toUpperCase(fileName)}</a>
-										<c:if test="${!st.last}">
-										/
-										</c:if>
-									</c:forTokens>
-									</td>
-								</tr>
-								<tr class="content">
-									<td colspan="4">${n.content}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					
-					<div class="margin-top text-align-center">
-						<a class="btn btn-list" href="list">목록</a>
-					</div>
-					
-					<div class="margin-top">
-						<table class="table border-top-default">
-							<tbody>
-								
-								<tr>
-									<th>다음글</th>
-									<td colspan="3"  class="text-align-left text-indent">다음글이 없습니다.</td>
-								</tr>
-								
-									
-								
-								
-								<tr>
-									<th>이전글</th>
-									<td colspan="3"  class="text-align-left text-indent"><a class="text-blue text-strong" href="">스프링 DI 예제 코드</a></td>
-								</tr>
-								
-								
-							</tbody>
-						</table>
-					</div>			
-					
-			</main>		
+			<!-- content 부분 -->
+			
+	<main class="main">
+		<h2 class="main title">관리자홈</h2>
+		
+		<div class="breadcrumb">
+			<h3 class="hidden">breadlet</h3>
+			<ul>
+				<li>home</li>
+				<li>마이페이지</li>
+				<li>홈</li>
+			</ul>
+		</div>
+		
+		<div class="margin-top first">
+		
+		</div>
+		
+	</main>
 			
 		</div>
 	</div>
-
-    <!-- ------------------- <footer> --------------------------------------- -->
-
-
+	<!-- ------------------- <footer> --------------------------------------- -->
+	
 
         <footer id="footer">
             <div class="content-container">
@@ -253,7 +179,5 @@
                 </div>
             </div>
         </footer>
-    </body>
-    
-    </html>
-   
+</body>
+</html>
