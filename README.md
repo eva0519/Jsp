@@ -1,5 +1,5 @@
 # Jsp
 
 #### used
-#### JAVA, SERVLET, JSP, EL, JSTL
+#### JAVA(jdk1.8), SERVLET, JSP, EL, JSTL
 #### ORACLE DB XE
