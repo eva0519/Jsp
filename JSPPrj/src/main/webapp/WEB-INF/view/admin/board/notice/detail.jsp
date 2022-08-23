@@ -177,7 +177,7 @@
 									<c:if test="${fn:endsWith(fileName, '.zip')}">
 										<c:set var="style" value="font-weight:bold; color:red;"/>
 									</c:if>
-									<a href="${fileName}" style="${style}">${fn:toUpperCase(fileName)}</a>
+									<a download href="/upload/${fileName}" style="${style}">${fn:toUpperCase(fileName)}</a>
 									<c:if test="${!st.last}">
 									/
 									</c:if>

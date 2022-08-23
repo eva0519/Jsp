@@ -43,6 +43,8 @@ public class RegController extends HttpServlet{
 		
 		for(Part p : parts) {
 			if(!p.getName().equals("file")) continue;
+			if(p.getSize() == 0) continue;
+			// 파일이 0개 또는 한개만 올라올 경우
 			
 			Part filepart = p;
 			String fileName = filepart.getSubmittedFileName();
@@ -53,6 +55,13 @@ public class RegController extends HttpServlet{
 			// DB 저장을 위해 파일명들로 문자열 만들기
 			
 			String realPath = request.getServletContext().getRealPath("/upload");
+			// servlet 서비스의 실제 경로 가져오기
+			
+			File path = new File(realPath);
+			if(!path.exists())
+				path.mkdirs();
+			// 경로가 없다면 만든다
+			
 			String filePath = realPath + File.separator + fileName;
 			// 절대 경로 설정하기
 			FileOutputStream fos = new FileOutputStream(filePath);

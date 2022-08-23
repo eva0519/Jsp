@@ -26,16 +26,75 @@ public class NoticeService {
 		return 0;
 	}
 	
-	public int pubNoticeAll(int[] ids){
+	public int pubNoticeAll(int[] oids, int[] cids){
 		
-		return 0;
+		List<String> oidsList = new ArrayList<>();
+		for (int i = 0; i < oids.length; i++) {
+			oidsList.add(String.valueOf(oids));
+		}
+		List<String> cidsList = new ArrayList<>();
+		for (int i = 0; i < cids.length; i++) {
+			cidsList.add(String.valueOf(cids));
+		}
+		// 스트링 리스트 객체를 만든다. for문 돌려서 문자열로 형변환해서 차곡차곡 담는다
+		// for문 하나로 해결될 걸 라이브러리를 쓰는 건 역으로 성능 저하를 일으킬 수 있다
+		// 아래의 오버로드에서는 스트링 리스트 타입을 매개변수로 받고있다
+		
+		return pubNoticeAll(oidsList, cidsList);
+	}
+	
+	public int pubNoticeAll(List<String> oids, List<String> cids){
+		
+		// 위에서 정수 배열 인자로 호출당한 친구가 만들어 보내준 스트링 리스트를 이어받는다 
+		String oidsCSV = String.join(",", oids);
+		String cidsCSV = String.join(",", cids);
+		// CSV 형으로 만들어서 아래의 친구를 호출한다
+		
+		return pubNoticeAll(oidsCSV, cidsCSV);
+	}
+
+	public int pubNoticeAll(String oidsCSV, String cidsCSV){
+		
+		// 원하는 타입의 자료형을 얻었다
+		
+		int result = 0;
+		
+		String sqlOpen = String.format("update notice set pub=1 where id in (%s)", oidsCSV);
+		String sqlClose = String.format("update notice set pub=0 where id in (%s)", cidsCSV);
+		// "+odisCSV+" 이러한 형식이 보기 싫다면 위처럼 format 하면 된다
+		
+		try {
+			
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			Connection con = DriverManager.getConnection(url, dID, dPW);
+			Statement stOpen = con.createStatement();
+			result += stOpen.executeUpdate(sqlOpen);
+
+			Statement stClose = con.createStatement();
+			result += stClose.executeUpdate(sqlClose);
+			// 현재 Transaction 처리를 하고 있지 않음. 해야한다.
+			
+			stOpen.close();
+			stClose.close();
+			con.close();
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// DB에 잘 등록되었다면 적용된 행의 갯수를 반환한다
+		return result;
 	}
 
 	public int insertNotice(Notice notice){
 		
 		int result = 0;
 		
-		String sql = "insert into notice(title, content, writer_id, pub) values(?, ?, ?, ?)";
+		String sql = "insert into notice(title, content, writer_id, pub, files) values(?, ?, ?, ?, ?)";
 		
 		try {
 			
@@ -46,6 +105,7 @@ public class NoticeService {
 			st.setString(2, notice.getContent());
 			st.setString(3, notice.getWriterId());
 			st.setBoolean(4, notice.getPub());
+			st.setString(5, notice.getFiles());
 
 			result = st.executeUpdate();
 			// insult, update, delete 를 사용할 때는 executeUpdate() 서비스 메소드를 사용한다.
@@ -157,6 +217,69 @@ public class NoticeService {
 		
 		return list;
 	}
+	
+	public List<NoticeView> getNoticePubList(String field, String query, int page) {
+		List<NoticeView> list = new ArrayList<>();
+		
+		String sql = "select * from "
+				+ "(select rownum NUM, N.* from "
+				+ "(select * from NOTICE_VIEW where "+field+" like ? order by regdate desc) N "
+				+ ") "
+				+ "where pub=1 and NUM between ? and ?";
+				
+		try {
+			
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			Connection con = DriverManager.getConnection(url, dID, dPW);
+			PreparedStatement st = con.prepareStatement(sql);
+			st.setString(1, "%"+query+"%");
+			st.setInt(2, 1+(page-1)*noticeLength);
+			st.setInt(3, page*noticeLength);
+			ResultSet rs = st.executeQuery();
+			
+			while(rs.next()){
+				int id = rs.getInt("ID");
+				String title = rs.getString("TITLE");
+				String writerId = rs.getString("WRITER_ID");
+				Date regdate = rs.getDate("REGDATE");
+				String hit = rs.getString("HIT");
+				String files = rs.getString("FILES");
+				//String content = rs.getString("CONTENT");
+				boolean pub = rs.getBoolean("PUB");
+				int cmtCount = rs.getInt("CMT_COUNT");
+				
+				NoticeView notice = new NoticeView(
+						id,
+						title,
+						writerId,
+						regdate,
+						hit,
+						files,
+						pub,
+						//content,
+						cmtCount
+						);
+				
+				list.add(notice);
+				
+			}
+			
+			rs.close();
+			st.close();
+			con.close();
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		return list;
+	}
+	
 	
 	public int getNoticeCount() {
 		
@@ -405,6 +528,5 @@ public class NoticeService {
 		
 		return result;
 	}
-	
 	
 }
